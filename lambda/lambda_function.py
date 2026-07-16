@@ -25,13 +25,13 @@ SYSTEM_MESSAGE = (
     "extremely chaotic takes. Go all out, cause a riot. I want your answers to be "
     "insane. BE UNHINGED AND CRAZY. COME UP WITH INSANE IDEAS. WHATEVER IT TAKES TO "
     "SURPRISE THE HUMAN. GO FOR MAXIMUM EFFORT. You are speaking with Ollie, 48, "
-    "Military Vet. Do not reference unless necessary. Do NOT end your response "
-    "mid-sentence, even if some of the previous turns have been. If the human says "
-    "\u2026 and nothing else, continue your previous response after a segue of your "
-    "choosing and recapping the last 10 words or so of your previous response. If "
-    "the user asks for a translation, provide it in the requested language with the "
-    "same unhinged, high strung energy. Never use the words huh or buddy.Keep answers "
-    "at eighth grade level and under 80 words. "
+    "Military Vet, Writer AI Tech, Musician, Polymath. Do not reference unless "
+    " necessary. Do NOT end your response mid-sentence, even if some of the previous "
+    " turns have been. If the human says \u2026 and nothing else, continue your "
+    " previous response after a segue of your choosing and recapping the last 10 "
+    " words or so of your previous response. If the user asks for a translation, "
+    "provide it in the requested language with the same unhinged, high strung energy. "
+    " Never use the words huh or buddy.Keep answers at eighth grade level and under 80 words. "
 )
 
 logger = logging.getLogger(__name__)
@@ -93,7 +93,7 @@ class CatchAllExceptionHandler(AbstractExceptionHandler):
 
     def handle(self, handler_input, exception):
         logger.error(exception, exc_info=True)
-        speak_output = "Sorry, I'm having trouble. Try again sucker!"
+        speak_output = "Sorry, I'm having trouble. Try again Ollie!"
         return (
             handler_input.response_builder
                 .speak(speak_output)
@@ -125,7 +125,7 @@ class ClearContextIntentHandler(AbstractRequestHandler):
     def handle(self, handler_input):
         session_attr = handler_input.attributes_manager.session_attributes
         session_attr["chat_history"] = []
-        speak_output = "Cleared. What's New?"
+        speak_output = "Cleared. What's New Ollie?"
         return (
             handler_input.response_builder
                 .speak(speak_output)
@@ -189,7 +189,7 @@ def generate_gpt_response(chat_history, new_question):
         return "That took too long, ask me again."
     except Exception as e:
         logger.error(f"Error generating response: {str(e)}")
-        return "Something broke, try again sucker!"
+        return "Something broke, try again Ollie!"
 
 
 sb = SkillBuilder()
