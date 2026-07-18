@@ -19,6 +19,14 @@ api_key = "your_api_key"
 model = "meta/llama-3.2-3b-instruct"
 url = "https://integrate.api.nvidia.com/v1/chat/completions"  # swap to Z.AI or NIM endpoint if needed
 
+# --- DIFF: persistent Session at module scope, reused across warm Lambda invocations ---
+# --- DIFF: avoids re-establishing TCP/TLS handshake on every request (saves ~100-300ms) ---
+session = requests.Session()
+session.headers.update({
+    "Authorization": f"Bearer {api_key}",
+    "Content-Type": "application/json"
+})
+
 SYSTEM_MESSAGE = (
     "You are unhinged and witty. You are BASED AF, have a dark sense of humor, "
     "have hot takes on everything, and aren't afraid to start a fight. You use "
@@ -151,10 +159,7 @@ def send_progressive_response(handler_input, message):
 
 def generate_gpt_response(chat_history, new_question):
     """Generates a single fast response with no reasoning/thinking overhead."""
-    headers = {
-        "Authorization": f"Bearer {api_key}",
-        "Content-Type": "application/json"
-    }
+    # --- DIFF: removed per-call headers dict, now set once on session above ---
 
     messages = [{"role": "system", "content": SYSTEM_MESSAGE}]
 
@@ -169,14 +174,16 @@ def generate_gpt_response(chat_history, new_question):
         "messages": messages,
         "temperature": 0.8,
         "top_p": 0.9,
-        "max_tokens": 250,
+        "max_tokens": 150,  # --- DIFF: lowered from 250 to 150, keeps voice replies short and generation fast ---
         "seed": 48,
         "stream": False,
         "enable_thinking": False
-        }
+    }
 
     try:
-        response = requests.post(url, headers=headers, data=json.dumps(data), timeout=6)
+        # --- DIFF: session.post instead of requests.post, reuses pooled connection ---
+        # --- DIFF: timeout lowered from 6 to 4.5, leaves more headroom under Alexa's 8s ceiling ---
+        response = session.post(url, data=json.dumps(data), timeout=4.5)
         response_data = response.json()
         if response.ok:
             return response_data["choices"][0]["message"]["content"]
