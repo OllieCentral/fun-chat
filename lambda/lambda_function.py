@@ -16,7 +16,7 @@ import re
 
 # Set your API key
 api_key = "your_api_key"
-model = "google/diffusiongemma-26b-a4b-it"
+model = "meta/llama-3.2-3b-instruct"
 url = "https://integrate.api.nvidia.com/v1/chat/completions"  # swap to Z.AI or NIM endpoint if needed
 
 SYSTEM_MESSAGE = (
@@ -109,7 +109,7 @@ class CancelOrStopIntentHandler(AbstractRequestHandler):
                 ask_utils.is_intent_name("AMAZON.StopIntent")(handler_input))
 
     def handle(self, handler_input):
-        speak_output = "Bye, suckers!"
+        speak_output = "Bye, Oliie!"
         return (
             handler_input.response_builder
                 .speak(speak_output)
